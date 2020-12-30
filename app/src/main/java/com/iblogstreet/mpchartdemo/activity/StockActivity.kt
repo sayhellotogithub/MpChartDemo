@@ -6,20 +6,14 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
 import android.util.TypedValue
-import android.view.MotionEvent
-import android.widget.FrameLayout
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.github.mikephil.charting.components.XAxis.XAxisPosition
 import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.*
-import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
-import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import com.github.mikephil.charting.utils.Transformer
 import com.iblogstreet.mpchartdemo.R
 import com.iblogstreet.mpchartdemo.bean.StockBean
-import com.iblogstreet.mpchartdemo.util.ChartsControllerOnTouchUtils
 import com.iblogstreet.mpchartdemo.util.MockUtil
 import com.iblogstreet.mpchartdemo.util.StockUtil
 import com.iblogstreet.mpchartdemo.view.*
@@ -28,21 +22,21 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class MainActivity : AppCompatActivity(), CoupleChartGestureListener.OnEdgeListener,
+class StockActivity : AppCompatActivity(), CoupleChartGestureListener.OnEdgeListener,
     ChartFingerTouchListener.HighlightListener,
     CoupleChartValueSelectedListener.ValueSelectedListener {
 
     private lateinit var chart: StockCombinedChart
     private lateinit var stock_chart: StockCombinedChart
-    private lateinit var fl_main_touch: FrameLayout
+//    private lateinit var fl_main_touch: FrameLayout
     private var candleSet: CandleDataSet? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_stock)
         chart = findViewById(R.id.chart1)
         stock_chart = findViewById(R.id.stock_chart)
-        fl_main_touch = findViewById(R.id.fl_main_touch)
+//        fl_main_touch = findViewById(R.id.fl_main_touch)
 
         initStockChart()
 
@@ -56,61 +50,52 @@ class MainActivity : AppCompatActivity(), CoupleChartGestureListener.OnEdgeListe
     private var ccGesture: CoupleChartGestureListener? = null
     private var bcGesture: CoupleChartGestureListener? = null
     private fun initEvent() {
-        ChartsControllerOnTouchUtils.bind(fl_main_touch, stock_chart, chart)
-        stock_chart.setOnChartValueSelectedListener(object:OnChartValueSelectedListener{
-            override fun onNothingSelected() {
-                Log.e("onNothingSelected","onNothingSelected")
-            }
+//        ChartsControllerOnTouchUtils.bind(fl_main_touch, stock_chart, chart)
 
-            override fun onValueSelected(e: Entry, h: Highlight?) {
-                Log.e("onValueSelected",e.toString())
-            }
-
-        })
-
-        ccGesture = object : CoupleChartGestureListener(this, stock_chart, chart) {
-            override fun chartDoubleTapped(me: MotionEvent?) {
-                doubleTapped()
-            }
-        }
-        stock_chart.setOnChartGestureListener(ccGesture) //设置手势联动监听
-
-        bcGesture = object : CoupleChartGestureListener(this, chart, stock_chart) {
-            override fun chartDoubleTapped(me: MotionEvent?) {
-                doubleTapped()
-            }
-        }
-
-        chart.setOnChartGestureListener(bcGesture)
-
-//        stock_chart.setOnChartValueSelectedListener(
-//            CoupleChartValueSelectedListener(
-//                this,
-//                stock_chart,
-//                chart
-//            )
-//        ) //设置高亮联动监听
+//        ccGesture = object : CoupleChartGestureListener(this, stock_chart, chart) {
+//            //设置成全局变量，后续要用到
+//            override fun chartDoubleTapped(me: MotionEvent?) {
+//                doubleTapped()
+//            }
+//        }
+//        stock_chart.setOnChartGestureListener(ccGesture) //设置手势联动监听
 //
-//        stock_chart.setOnChartValueSelectedListener(
-//            CoupleChartValueSelectedListener(
-//                this,
-//                stock_chart,
-//                chart
-//            )
-//        ) //设置高亮联动监听
+//        bcGesture = object : CoupleChartGestureListener(this, chart, stock_chart) {
+//            override fun chartDoubleTapped(me: MotionEvent?) {
+//                doubleTapped()
+//            }
+//        }
 //
-//
-//        chart.setOnChartValueSelectedListener(
-//            CoupleChartValueSelectedListener(
-//                this,
-//                chart,
-//                stock_chart
-//            )
-//        )
-//
-//        stock_chart.setOnTouchListener(ChartFingerTouchListener(stock_chart, this)) //手指长按滑动高亮
-//
-//        chart.setOnTouchListener(ChartFingerTouchListener(chart, this))
+//        chart.setOnChartGestureListener(bcGesture)
+
+        stock_chart.setOnChartValueSelectedListener(
+            CoupleChartValueSelectedListener(
+                this,
+                stock_chart,
+                chart
+            )
+        ) //设置高亮联动监听
+
+        stock_chart.setOnChartValueSelectedListener(
+            CoupleChartValueSelectedListener(
+                this,
+                stock_chart,
+                chart
+            )
+        ) //设置高亮联动监听
+
+
+        chart.setOnChartValueSelectedListener(
+            CoupleChartValueSelectedListener(
+                this,
+                chart,
+                stock_chart
+            )
+        )
+
+        stock_chart.setOnTouchListener(ChartFingerTouchListener(stock_chart, this)) //手指长按滑动高亮
+
+        chart.setOnTouchListener(ChartFingerTouchListener(chart, this))
 
     }
 
@@ -118,7 +103,6 @@ class MainActivity : AppCompatActivity(), CoupleChartGestureListener.OnEdgeListe
      * 双击图表
      */
     private fun doubleTapped() {
-
 //        if (isPort()) {
 //            highVisX = cc.getHighestVisibleX()
 //            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
@@ -225,6 +209,14 @@ class MainActivity : AppCompatActivity(), CoupleChartGestureListener.OnEdgeListe
 
     }
 
+
+    fun sp2px(spValue: Float): Int {
+        return TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_SP, spValue,
+            getResources().getDisplayMetrics()
+        ).toInt()
+    }
+
     private fun initChart() {
 
         chart.getDescription().setEnabled(false)
@@ -291,7 +283,7 @@ class MainActivity : AppCompatActivity(), CoupleChartGestureListener.OnEdgeListe
         //X轴
         val xAxis = chart.xAxis
         xAxis.position = XAxisPosition.BOTTOM
-        xAxis.isEnabled = true
+        xAxis.isEnabled = false
         xAxis.axisMinimum = 0f
         xAxis.granularity = 1f
 
