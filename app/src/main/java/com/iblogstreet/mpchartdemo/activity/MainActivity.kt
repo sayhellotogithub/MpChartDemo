@@ -46,7 +46,7 @@ class MainActivity : AppCompatActivity(), CoupleChartGestureListener.OnEdgeListe
         barChart = findViewById(R.id.bar_chart)
         stock_chart = findViewById(R.id.stock_chart)
         fl_main_touch = findViewById(R.id.fl_main_touch)
-        touchUtils = ChartsControllerOnTouchUtils()
+//        touchUtils = ChartsControllerOnTouchUtils()
 
         initStockChart()
         initChart()
@@ -57,21 +57,21 @@ class MainActivity : AppCompatActivity(), CoupleChartGestureListener.OnEdgeListe
     private var ccGesture: CoupleChartGestureListener? = null
     private var bcGesture: CoupleChartGestureListener? = null
     private fun initEvent() {
-        touchUtils.bind(this, fl_main_touch, stock_chart, barChart)
+//        touchUtils.bind(this, fl_main_touch, stock_chart, barChart)
 
-//        ccGesture = object : CoupleChartGestureListener(this, stock_chart, barChart) {
-//            override fun chartDoubleTapped(me: MotionEvent?) {
-//                doubleTapped()
-//            }
-//        }
-//        stock_chart.setOnChartGestureListener(ccGesture) //设置手势联动监听
-//
-//        bcGesture = object : CoupleChartGestureListener(this, barChart, stock_chart) {
-//            override fun chartDoubleTapped(me: MotionEvent?) {
-//                doubleTapped()
-//            }
-//        }
-//        barChart.setOnChartGestureListener(bcGesture)
+        ccGesture = object : CoupleChartGestureListener(this, false, stock_chart, barChart) {
+            override fun chartDoubleTapped(me: MotionEvent?) {
+                doubleTapped()
+            }
+        }
+        stock_chart.setOnChartGestureListener(ccGesture) //设置手势联动监听
+
+        bcGesture = object : CoupleChartGestureListener(this, true, barChart, stock_chart) {
+            override fun chartDoubleTapped(me: MotionEvent?) {
+                doubleTapped()
+            }
+        }
+        barChart.setOnChartGestureListener(bcGesture)
 
     }
 
@@ -451,30 +451,30 @@ class MainActivity : AppCompatActivity(), CoupleChartGestureListener.OnEdgeListe
     private val xValues = HashMap<Int, String?>()
     override fun edgeLoad(x: Float, left: Boolean) {
         Log.e("edgeLoad", "$x:$left")
-        var v = x.toInt()
-        if (!left && !xValues.containsKey(v) && xValues.containsKey(v - 1)) {
-            v = v - 1
-        }
-        val time: String? = xValues.get(v)
-        if (!TextUtils.isEmpty(time)) {
-            try {
-//                val t: Long = sdf.parse(time).getTime()
-//                if (!left) { //向右获取数据时判断时间间隔
-//                    val interval: Long =
-//                        KL_INTERVAL.get(tabLayout.getSelectedTabPosition()) * M1
-//                    if (System.currentTimeMillis() - t < interval) { //不会有新数据
-//                        return
-//                    }
-//                }
-                val loadingDialog = LoadingDialog.newInstance()
-                loadingDialog.show(this)
-//                toLeft = left
-//                getData(t * 1000000L.toString() + "")
-
-            } catch (e: ParseException) {
-                e.printStackTrace()
-            }
-        }
+//        var v = x.toInt()
+//        if (!left && !xValues.containsKey(v) && xValues.containsKey(v - 1)) {
+//            v = v - 1
+//        }
+//        val time: String? = xValues.get(v)
+//        if (!TextUtils.isEmpty(time)) {
+//            try {
+////                val t: Long = sdf.parse(time).getTime()
+////                if (!left) { //向右获取数据时判断时间间隔
+////                    val interval: Long =
+////                        KL_INTERVAL.get(tabLayout.getSelectedTabPosition()) * M1
+////                    if (System.currentTimeMillis() - t < interval) { //不会有新数据
+////                        return
+////                    }
+////                }
+//                val loadingDialog = LoadingDialog.newInstance()
+//                loadingDialog.show(this)
+////                toLeft = left
+////                getData(t * 1000000L.toString() + "")
+//
+//            } catch (e: ParseException) {
+//                e.printStackTrace()
+//            }
+//        }
     }
 
     override fun enableHighlight() {

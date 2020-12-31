@@ -16,6 +16,7 @@ public class CoupleChartGestureListener implements OnChartGestureListener {
 
     private BarLineChartBase srcChart;
     private Chart[] dstCharts;
+    private boolean isFollow = true;
 
     private OnEdgeListener edgeListener;//滑动到边缘的监听器
     private boolean isLoadMore, isHighlight;//是否加载更多、是否高亮  -- 高亮时不再加载更多
@@ -27,8 +28,9 @@ public class CoupleChartGestureListener implements OnChartGestureListener {
         isLoadMore = false;
     }
 
-    public CoupleChartGestureListener(OnEdgeListener edgeListener, BarLineChartBase srcChart,
+    public CoupleChartGestureListener(OnEdgeListener edgeListener, boolean isFollow, BarLineChartBase srcChart,
                                       Chart... dstCharts) {
+        this.isFollow = isFollow;
         this.edgeListener = edgeListener;
         this.srcChart = srcChart;
         this.dstCharts = dstCharts;
@@ -45,7 +47,7 @@ public class CoupleChartGestureListener implements OnChartGestureListener {
     }
 
     private boolean canJudgeLoad(ChartTouchListener.ChartGesture lastPerformedGesture) {
-        return  lastPerformedGesture == ChartTouchListener.ChartGesture.FLING;
+        return lastPerformedGesture == ChartTouchListener.ChartGesture.FLING;
     }
 
     private float firstX = 0;
@@ -171,12 +173,15 @@ public class CoupleChartGestureListener implements OnChartGestureListener {
         for (Chart dstChart : dstCharts) {
             dstMatrix = dstChart.getViewPortHandler().getMatrixTouch();
             dstMatrix.getValues(dstVals);
+            if (isFollow) {
+                dstVals[Matrix.MSCALE_Y] = srcVals[Matrix.MSCALE_Y];
+            }
 
             dstVals[Matrix.MSCALE_X] = srcVals[Matrix.MSCALE_X];
             dstVals[Matrix.MSKEW_X] = srcVals[Matrix.MSKEW_X];
             dstVals[Matrix.MTRANS_X] = srcVals[Matrix.MTRANS_X];
             dstVals[Matrix.MSKEW_Y] = srcVals[Matrix.MSKEW_Y];
-            dstVals[Matrix.MSCALE_Y] = srcVals[Matrix.MSCALE_Y];
+
             dstVals[Matrix.MTRANS_Y] = srcVals[Matrix.MTRANS_Y];
             dstVals[Matrix.MPERSP_0] = srcVals[Matrix.MPERSP_0];
             dstVals[Matrix.MPERSP_1] = srcVals[Matrix.MPERSP_1];
