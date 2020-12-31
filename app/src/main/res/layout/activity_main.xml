@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".activity.MainActivity">
 
@@ -140,20 +140,23 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
         <RelativeLayout
-            android:layout_width="match_parent"
             android:id="@+id/rl_stock"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@id/volume_chart"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_weight="2">
 
             <com.github.mikephil.charting.charts.CombinedChart
-                android:id="@+id/stock_chart"
+                android:id="@+id/k_line_chart"
                 android:layout_width="match_parent"
-                android:layout_height="200dp" />
+                android:layout_height="match_parent" />
 
             <TextView
                 android:id="@+id/tv_line_info"
@@ -166,13 +169,25 @@
         </RelativeLayout>
 
 
-        <com.github.mikephil.charting.charts.BarChart
-            android:id="@+id/bar_chart"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
+        <com.github.mikephil.charting.charts.CombinedChart
+            android:id="@+id/volume_chart"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@+id/index_chart"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/rl_stock" />
+            app:layout_constraintTop_toBottomOf="@id/rl_stock"
+            app:layout_constraintVertical_weight="1" />
+
+        <com.github.mikephil.charting.charts.CombinedChart
+            android:id="@+id/index_chart"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/volume_chart"
+            app:layout_constraintVertical_weight="1" />
 
         <FrameLayout
             android:id="@+id/fl_main_touch"
