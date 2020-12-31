@@ -7,6 +7,7 @@ import android.text.TextUtils
 import android.util.Log
 import android.util.TypedValue
 import androidx.appcompat.app.AppCompatActivity
+import com.github.mikephil.charting.charts.CombinedChart
 import com.github.mikephil.charting.components.XAxis.XAxisPosition
 import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.*
@@ -26,8 +27,8 @@ class StockActivity : AppCompatActivity(), CoupleChartGestureListener.OnEdgeList
     ChartFingerTouchListener.HighlightListener,
     CoupleChartValueSelectedListener.ValueSelectedListener {
 
-    private lateinit var chart: StockCombinedChart
-    private lateinit var stock_chart: StockCombinedChart
+    private lateinit var chart: CombinedChart
+    private lateinit var stock_chart: CombinedChart
 //    private lateinit var fl_main_touch: FrameLayout
     private var candleSet: CandleDataSet? = null
 
@@ -153,8 +154,8 @@ class StockActivity : AppCompatActivity(), CoupleChartGestureListener.OnEdgeList
 
         // draw bars behind lines
         stock_chart.drawOrder = arrayOf(
-            StockCombinedChart.DrawOrder.CANDLE,
-            StockCombinedChart.DrawOrder.LINE
+            CombinedChart.DrawOrder.CANDLE,
+            CombinedChart.DrawOrder.LINE
         )
 
         val trans: Transformer = stock_chart.getTransformer(YAxis.AxisDependency.LEFT)
@@ -254,8 +255,8 @@ class StockActivity : AppCompatActivity(), CoupleChartGestureListener.OnEdgeList
 
         // draw bars behind lines
         chart.drawOrder = arrayOf(
-            StockCombinedChart.DrawOrder.BAR,
-            StockCombinedChart.DrawOrder.LINE
+            CombinedChart.DrawOrder.BAR,
+            CombinedChart.DrawOrder.LINE
         )
 
         //Y轴-右

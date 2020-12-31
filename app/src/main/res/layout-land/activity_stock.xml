@@ -272,7 +272,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0.3">
-        <com.iblogstreet.mpchartdemo.view.StockCombinedChart
+        <com.github.mikephil.charting.charts.CombinedChart
             android:id="@+id/stock_chart"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
@@ -285,7 +285,7 @@
             android:textSize="8sp"
             android:visibility="gone"/>
     </RelativeLayout>
-    <com.iblogstreet.mpchartdemo.view.StockCombinedChart
+    <com.github.mikephil.charting.charts.CombinedChart
         android:id="@+id/chart1"
         android:layout_width="match_parent"
         android:layout_height="0dp"

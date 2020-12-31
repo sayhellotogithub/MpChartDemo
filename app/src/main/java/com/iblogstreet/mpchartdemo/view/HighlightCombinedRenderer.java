@@ -3,7 +3,6 @@ package com.iblogstreet.mpchartdemo.view;
 import com.github.mikephil.charting.animation.ChartAnimator;
 import com.github.mikephil.charting.charts.CombinedChart;
 import com.github.mikephil.charting.charts.CombinedChart.DrawOrder;
-import com.github.mikephil.charting.renderer.BarChartRenderer;
 import com.github.mikephil.charting.renderer.BubbleChartRenderer;
 import com.github.mikephil.charting.renderer.CombinedChartRenderer;
 import com.github.mikephil.charting.renderer.ScatterChartRenderer;
@@ -33,7 +32,7 @@ public class HighlightCombinedRenderer extends CombinedChartRenderer {
             switch (order) {
                 case BAR:
                     if (chart.getBarData() != null)
-                        mRenderers.add(new BarChartRenderer(chart, mAnimator, mViewPortHandler));
+                        mRenderers.add(new OffsetBarRenderer(chart, mAnimator, mViewPortHandler));
                     break;
                 case BUBBLE:
                     if (chart.getBubbleData() != null)

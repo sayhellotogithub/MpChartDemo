@@ -8,14 +8,13 @@ import android.util.Log
 import android.util.TypedValue
 import android.view.MotionEvent
 import android.widget.FrameLayout
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.charts.CombinedChart
 import com.github.mikephil.charting.components.XAxis.XAxisPosition
 import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.*
-import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
-import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import com.github.mikephil.charting.utils.Transformer
 import com.iblogstreet.mpchartdemo.R
 import com.iblogstreet.mpchartdemo.bean.StockBean
@@ -29,88 +28,50 @@ import kotlin.collections.ArrayList
 
 
 class MainActivity : AppCompatActivity(), CoupleChartGestureListener.OnEdgeListener,
-    ChartFingerTouchListener.HighlightListener,
+    ChartsControllerOnTouchUtils.HighlightListener,
     CoupleChartValueSelectedListener.ValueSelectedListener {
 
-    private lateinit var chart: StockCombinedChart
-    private lateinit var stock_chart: StockCombinedChart
+    private lateinit var barChart: BarChart
+    private lateinit var stock_chart: CombinedChart
     private lateinit var fl_main_touch: FrameLayout
-    private var candleSet: CandleDataSet? = null
+
+    private var stockCandleData: CandleData? = null
+    private var lineData: LineData? = null
+    private var barData: BarData? = null
+    private lateinit var touchUtils: ChartsControllerOnTouchUtils
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        chart = findViewById(R.id.chart1)
+        barChart = findViewById(R.id.bar_chart)
         stock_chart = findViewById(R.id.stock_chart)
         fl_main_touch = findViewById(R.id.fl_main_touch)
+        touchUtils = ChartsControllerOnTouchUtils()
 
         initStockChart()
-
         initChart()
-
         initData()
-
         initEvent()
     }
 
     private var ccGesture: CoupleChartGestureListener? = null
     private var bcGesture: CoupleChartGestureListener? = null
     private fun initEvent() {
-        ChartsControllerOnTouchUtils.bind(fl_main_touch, stock_chart, chart)
-        stock_chart.setOnChartValueSelectedListener(object:OnChartValueSelectedListener{
-            override fun onNothingSelected() {
-                Log.e("onNothingSelected","onNothingSelected")
-            }
+        touchUtils.bind(this, fl_main_touch, stock_chart, barChart)
 
-            override fun onValueSelected(e: Entry, h: Highlight?) {
-                Log.e("onValueSelected",e.toString())
-            }
-
-        })
-
-        ccGesture = object : CoupleChartGestureListener(this, stock_chart, chart) {
-            override fun chartDoubleTapped(me: MotionEvent?) {
-                doubleTapped()
-            }
-        }
-        stock_chart.setOnChartGestureListener(ccGesture) //设置手势联动监听
-
-        bcGesture = object : CoupleChartGestureListener(this, chart, stock_chart) {
-            override fun chartDoubleTapped(me: MotionEvent?) {
-                doubleTapped()
-            }
-        }
-
-        chart.setOnChartGestureListener(bcGesture)
-
-//        stock_chart.setOnChartValueSelectedListener(
-//            CoupleChartValueSelectedListener(
-//                this,
-//                stock_chart,
-//                chart
-//            )
-//        ) //设置高亮联动监听
+//        ccGesture = object : CoupleChartGestureListener(this, stock_chart, barChart) {
+//            override fun chartDoubleTapped(me: MotionEvent?) {
+//                doubleTapped()
+//            }
+//        }
+//        stock_chart.setOnChartGestureListener(ccGesture) //设置手势联动监听
 //
-//        stock_chart.setOnChartValueSelectedListener(
-//            CoupleChartValueSelectedListener(
-//                this,
-//                stock_chart,
-//                chart
-//            )
-//        ) //设置高亮联动监听
-//
-//
-//        chart.setOnChartValueSelectedListener(
-//            CoupleChartValueSelectedListener(
-//                this,
-//                chart,
-//                stock_chart
-//            )
-//        )
-//
-//        stock_chart.setOnTouchListener(ChartFingerTouchListener(stock_chart, this)) //手指长按滑动高亮
-//
-//        chart.setOnTouchListener(ChartFingerTouchListener(chart, this))
+//        bcGesture = object : CoupleChartGestureListener(this, barChart, stock_chart) {
+//            override fun chartDoubleTapped(me: MotionEvent?) {
+//                doubleTapped()
+//            }
+//        }
+//        barChart.setOnChartGestureListener(bcGesture)
 
     }
 
@@ -133,7 +94,15 @@ class MainActivity : AppCompatActivity(), CoupleChartGestureListener.OnEdgeListe
     val highlightWidth = 0.5f //高亮线的线宽
     private val barOffset = -0.5f //BarChart偏移量
 
+    fun sp2px(spValue: Float): Int {
+        return TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_SP, spValue,
+            resources.displayMetrics
+        ).toInt()
+    }
+
     private fun initStockChart() {
+        var sp8: Float = sp2px(8f).toFloat()
         stock_chart.getDescription().setEnabled(false)
         stock_chart.setBackgroundColor(Color.WHITE)
         stock_chart.setDrawGridBackground(false)
@@ -164,13 +133,13 @@ class MainActivity : AppCompatActivity(), CoupleChartGestureListener.OnEdgeListe
 
         //缩放
         stock_chart.setScaleXEnabled(true) //X轴缩放
-        stock_chart.isScaleYEnabled = false
-        stock_chart.isAutoScaleMinMaxEnabled = false//自适应最大最小值
+        stock_chart.isScaleYEnabled = true
+        stock_chart.isAutoScaleMinMaxEnabled = true//自适应最大最小值
 
         // draw bars behind lines
         stock_chart.drawOrder = arrayOf(
-            StockCombinedChart.DrawOrder.CANDLE,
-            StockCombinedChart.DrawOrder.LINE
+            CombinedChart.DrawOrder.CANDLE,
+            CombinedChart.DrawOrder.LINE
         )
 
         val trans: Transformer = stock_chart.getTransformer(YAxis.AxisDependency.LEFT)
@@ -182,6 +151,16 @@ class MainActivity : AppCompatActivity(), CoupleChartGestureListener.OnEdgeListe
                 stock_chart.getXAxis(),
                 trans,
                 10
+            )
+        )
+
+        //自定义渲染器 重绘高亮
+        stock_chart.setRenderer(
+            HighlightCombinedRenderer(
+                stock_chart,
+                stock_chart.getAnimator(),
+                stock_chart.getViewPortHandler(),
+                sp8
             )
         )
 
@@ -226,13 +205,12 @@ class MainActivity : AppCompatActivity(), CoupleChartGestureListener.OnEdgeListe
     }
 
     private fun initChart() {
-
-        chart.getDescription().setEnabled(false)
-        chart.setBackgroundColor(Color.WHITE)
-        chart.setDrawGridBackground(false)
-        chart.setDrawBarShadow(false)
-        chart.setHighlightFullBarEnabled(false)
-
+        var sp8: Float = sp2px(8f).toFloat()
+        barChart.getDescription().setEnabled(false)
+        barChart.setBackgroundColor(Color.WHITE)
+        barChart.setDrawGridBackground(false)
+        barChart.setDrawBarShadow(false)
+        barChart.setHighlightFullBarEnabled(false)
 
         //        val l = stock_chart.legend
 //        l.isWordWrapEnabled = true
@@ -241,39 +219,68 @@ class MainActivity : AppCompatActivity(), CoupleChartGestureListener.OnEdgeListe
 //        l.orientation = Legend.LegendOrientation.HORIZONTAL
 //        l.setDrawInside(false)
         //取消图例
-        chart.legend.isEnabled = false
+        barChart.legend.isEnabled = false
 
         //无数据时
-        chart.setNoDataText("No Data")
-        chart.setNoDataTextColor(gray)
+        barChart.setNoDataText("No Data")
+        barChart.setNoDataTextColor(gray)
 
         //不允许甩动惯性滑动  和moveView方法有冲突 设置为false
-        chart.isDragDecelerationEnabled = false
+        barChart.isDragDecelerationEnabled = false
 
         //外边缘偏移量
-        chart.minOffset = 0f
+        barChart.minOffset = 0f
         //设置底部外边缘偏移量 便于显示X轴
-        chart.extraBottomOffset = 6f
+        barChart.extraBottomOffset = 6f
 
         //缩放
-        chart.isScaleXEnabled = true //X轴缩放
-        chart.isScaleYEnabled = false
-        chart.isAutoScaleMinMaxEnabled = false//自适应最大最小值
+        barChart.isScaleXEnabled = true //X轴缩放
+        barChart.isScaleYEnabled = false
+        barChart.isAutoScaleMinMaxEnabled = true//自适应最大最小值
 
         // draw bars behind lines
-        chart.drawOrder = arrayOf(
-            StockCombinedChart.DrawOrder.BAR,
-            StockCombinedChart.DrawOrder.LINE
-        )
+//        barChart.drawOrder = arrayOf(
+//            CombinedChart.DrawOrder.BAR,
+//            CombinedChart.DrawOrder.LINE
+//        )
+
+        val trans: Transformer = barChart.getTransformer(YAxis.AxisDependency.LEFT)
+        barChart.rendererLeftYAxis =
+            InBoundYAxisRenderer(barChart.viewPortHandler, barChart.axisLeft, trans)
+
+        //设置渲染器控制颜色、偏移，以及高亮
+//        barChart.setRenderer(
+//            OffsetBarRenderer(barChart, barChart.getAnimator(), bc.getViewPortHandler(), barOffset)
+//                .setHighlightWidthSize(highlightWidth, sp8)
+//        )
+//
+
+//        barChart.setXAxisRenderer(
+//            InBoundXAxisRenderer(
+//                barChart.getViewPortHandler(),
+//                barChart.getXAxis(),
+//                trans,
+//                10
+//            )
+//        )
+//        //自定义渲染器 重绘高亮
+//        barChart.setRenderer(
+//            HighlightCombinedRenderer(
+//                barChart,
+//                barChart.getAnimator(),
+//                barChart.getViewPortHandler(),
+//                sp8
+//            )
+//        )
 
         //Y轴-右
-        val rightAxis = chart.axisRight
+        val rightAxis = barChart.axisRight
         rightAxis.setDrawGridLines(false)
         rightAxis.isEnabled = false
         rightAxis.axisMinimum = 0f // this replaces setStartAtZero(true)
 
         //Y轴-左
-        val leftAxis = chart.axisLeft
+        val leftAxis = barChart.axisLeft
 //        leftAxis.setPosition(YAxis.YAxisLabelPosition.INSIDE_CHART)//标签显示在内侧
         leftAxis.setDrawGridLines(false)
 //        leftAxis.gridColor = black
@@ -289,9 +296,9 @@ class MainActivity : AppCompatActivity(), CoupleChartGestureListener.OnEdgeListe
 
 
         //X轴
-        val xAxis = chart.xAxis
+        val xAxis = barChart.xAxis
         xAxis.position = XAxisPosition.BOTTOM
-        xAxis.isEnabled = true
+        xAxis.isEnabled = false
         xAxis.axisMinimum = 0f
         xAxis.granularity = 1f
 
@@ -307,7 +314,6 @@ class MainActivity : AppCompatActivity(), CoupleChartGestureListener.OnEdgeListe
 
     }
 
-    private var barSet: BarDataSet? = null
     private fun generateBarData(entries1: ArrayList<BarEntry>): BarData? {
 
         val set1 = BarDataSet(entries1, "Bar 1")
@@ -323,14 +329,15 @@ class MainActivity : AppCompatActivity(), CoupleChartGestureListener.OnEdgeListe
 
         set1.setDrawValues(false)
 
+        set1.highLightColor = highlightColor
 
         val barWidth = 0.8f // x2 dataset
 
         val dataSets = ArrayList<IBarDataSet>()
         dataSets.add(set1)
 
-        barSet = set1
         val d = BarData(dataSets)
+
         d.barWidth = barWidth
         return d
     }
@@ -369,8 +376,12 @@ class MainActivity : AppCompatActivity(), CoupleChartGestureListener.OnEdgeListe
         }
 
         val combinedData = CombinedData()
-        combinedData.setData(generateCandleData(candleValues))
-        combinedData.setData(generateLineData(lineValues))
+        stockCandleData = generateCandleData(candleValues)
+
+        lineData = generateLineData(lineValues)
+
+        combinedData.setData(stockCandleData)
+        combinedData.setData(lineData)
 
         val xMax: Float = candleValues.size - 0.5f //默认X轴最大值是 xValues.size() - 1
         stock_chart.getXAxis().setAxisMaximum(xMax) //使最后一个显示完整
@@ -379,18 +390,16 @@ class MainActivity : AppCompatActivity(), CoupleChartGestureListener.OnEdgeListe
         stock_chart.invalidate()
 
         val data = CombinedData()
+        barData = generateBarData(barValues)
+        data.setData(barData)
 
-        data.setData(generateBarData(barValues))
-
-        chart.data = data
-        chart.invalidate()
+        barChart.data = barData
+        barChart.invalidate()
 
     }
 
     private fun generateCandleData(candleValues: ArrayList<CandleEntry>): CandleData {
         val set1 = CandleDataSet(candleValues, "Data Set")
-
-        candleSet=set1
 
         set1.setDrawIcons(false)
         set1.axisDependency = YAxis.AxisDependency.LEFT
@@ -435,6 +444,7 @@ class MainActivity : AppCompatActivity(), CoupleChartGestureListener.OnEdgeListe
         set.axisDependency = YAxis.AxisDependency.LEFT
 
         lineData.addDataSet(set)
+
         return lineData
     }
 
@@ -468,25 +478,26 @@ class MainActivity : AppCompatActivity(), CoupleChartGestureListener.OnEdgeListe
     }
 
     override fun enableHighlight() {
-        if (!barSet!!.isHighlightEnabled()) {
-            candleSet!!.setHighlightEnabled(true)
-//            lineSetMin.setHighlightEnabled(true)
-            barSet!!.setHighlightEnabled(true)
-        }
+        Log.e("enableHighlight", "enableHighlight")
+//        if (!barData!!.isHighlightEnabled()) {
+//        lineData!!.isHighlightEnabled = true
+        stockCandleData!!.setHighlightEnabled(true)
+        barData!!.setHighlightEnabled(true)
+
+
     }
 
     override fun disableHighlight() {
-        if (barSet!!.isHighlightEnabled()) {
-            candleSet!!.setHighlightEnabled(false)
-//            lineSetMin.setHighlightEnabled(false)
-            barSet!!.setHighlightEnabled(false)
-            if (ccGesture != null) {
-                ccGesture!!.setHighlight(true)
-            }
-            if (bcGesture != null) {
-                bcGesture!!.setHighlight(true)
-            }
-        }
+        Log.e("disableHighlight", "disableHighlight")
+//        stockCandleData!!.setHighlightEnabled(false)
+//        lineData?.setHighlightEnabled(false)
+//        barData!!.setHighlightEnabled(false)
+//        if (ccGesture != null) {
+//            ccGesture!!.setHighlight(true)
+//        }
+//        if (bcGesture != null) {
+//            bcGesture!!.setHighlight(true)
+//        }
     }
 
     override fun valueSelected(e: Entry) {
