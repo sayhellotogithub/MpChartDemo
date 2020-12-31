@@ -1,5 +1,6 @@
 package com.iblogstreet.mpchartdemo.view;
 
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -25,6 +26,7 @@ public class ChartFingerTouchListener implements View.OnTouchListener {
             public void onLongPress(MotionEvent e) {
                 super.onLongPress(e);
                 mIsLongPress = true;
+                Log.e("GestureDetector","onLongPress");
                 if (mListener != null) {
                     mListener.enableHighlight();
                 }

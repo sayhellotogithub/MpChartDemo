@@ -8,16 +8,163 @@
     tools:context=".activity.MainActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_klHighlight"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/tl_kl"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tl_kl"
+        tools:visibility="visible">
+
+        <TextView
+            android:id="@+id/tv_klOpenName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="开盘"
+            android:textColor="@color/gray8B"
+            android:textSize="10sp"
+            app:layout_constraintBottom_toTopOf="@+id/tv_klCloseName"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_klOpen"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="3dp"
+            android:hint="0000.0000"
+            android:text="--"
+            android:textColor="@drawable/sls_color_green_red"
+            android:textSize="10sp"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_klOpenName"
+            app:layout_constraintLeft_toRightOf="@+id/tv_klOpenName"
+            app:layout_constraintTop_toTopOf="@+id/tv_klOpenName" />
+
+        <TextView
+            android:id="@+id/tv_klCloseName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="收盘"
+            android:textColor="@color/gray8B"
+            android:textSize="10sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="@+id/tv_klOpenName"
+            app:layout_constraintTop_toBottomOf="@+id/tv_klOpenName" />
+
+        <TextView
+            android:id="@+id/tv_klClose"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="--"
+            android:textColor="@drawable/sls_color_green_red"
+            android:textSize="10sp"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_klCloseName"
+            app:layout_constraintLeft_toLeftOf="@+id/tv_klOpen"
+            app:layout_constraintTop_toTopOf="@+id/tv_klCloseName" />
+
+        <TextView
+            android:id="@+id/tv_klHighName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:text="最高"
+            android:textColor="@color/gray8B"
+            android:textSize="10sp"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_klOpenName"
+            app:layout_constraintLeft_toRightOf="@+id/tv_klOpen"
+            app:layout_constraintTop_toTopOf="@+id/tv_klOpenName" />
+
+        <TextView
+            android:id="@+id/tv_klHigh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="3dp"
+            android:hint="0000.0000"
+            android:text="--"
+            android:textColor="@drawable/sls_color_green_red"
+            android:textSize="10sp"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_klHighName"
+            app:layout_constraintLeft_toRightOf="@+id/tv_klHighName"
+            app:layout_constraintTop_toTopOf="@+id/tv_klHighName" />
+
+        <TextView
+            android:id="@+id/tv_klLowName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="最低"
+            android:textColor="@color/gray8B"
+            android:textSize="10sp"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_klCloseName"
+            app:layout_constraintLeft_toLeftOf="@+id/tv_klHighName"
+            app:layout_constraintTop_toBottomOf="@+id/tv_klHighName" />
+
+        <TextView
+            android:id="@+id/tv_klLow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="--"
+            android:textColor="@drawable/sls_color_green_red"
+            android:textSize="10sp"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_klLowName"
+            app:layout_constraintLeft_toLeftOf="@+id/tv_klHigh"
+            app:layout_constraintTop_toTopOf="@+id/tv_klLowName" />
+
+        <TextView
+            android:id="@+id/tv_klVolName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:text="成交量"
+            android:textColor="@color/gray8B"
+            android:textSize="10sp"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_klHighName"
+            app:layout_constraintLeft_toRightOf="@+id/tv_klHigh"
+            app:layout_constraintTop_toTopOf="@+id/tv_klHighName" />
+
+        <TextView
+            android:id="@+id/tv_klVol"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="3dp"
+            android:text="--"
+            android:textColor="@color/white"
+            android:textSize="10sp"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_klVolName"
+            app:layout_constraintLeft_toRightOf="@+id/tv_klVolName"
+            app:layout_constraintTop_toTopOf="@+id/tv_klVolName" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <com.github.mikephil.charting.charts.CombinedChart
-            android:id="@+id/stock_chart"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:id="@+id/rl_stock"
+            android:layout_height="wrap_content"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.github.mikephil.charting.charts.CombinedChart
+                android:id="@+id/stock_chart"
+                android:layout_width="match_parent"
+                android:layout_height="200dp" />
+
+            <TextView
+                android:id="@+id/tv_line_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="8dp"
+                android:textSize="8sp"
+                android:visibility="gone" />
+        </RelativeLayout>
+
 
         <com.github.mikephil.charting.charts.BarChart
             android:id="@+id/bar_chart"
@@ -25,16 +172,16 @@
             android:layout_height="200dp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/stock_chart" />
+            app:layout_constraintTop_toBottomOf="@id/rl_stock" />
 
         <FrameLayout
             android:id="@+id/fl_main_touch"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
             android:layout_width="match_parent"
-            android:layout_height="0dp" />
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 
