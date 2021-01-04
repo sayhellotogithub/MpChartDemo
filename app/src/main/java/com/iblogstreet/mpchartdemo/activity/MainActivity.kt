@@ -268,7 +268,7 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
         //Y轴-左
         val leftAxis = k_line_chart.axisLeft
         leftAxis.setPosition(YAxis.YAxisLabelPosition.INSIDE_CHART)//标签显示在内侧
-        leftAxis.setDrawGridLines(false)
+
 //        leftAxis.gridColor = black
 //        leftAxis.gridLineWidth
 
@@ -279,7 +279,8 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
         leftAxis.textSize = 8f
 //        leftAxis.setLabelCount(5, true)
 
-        leftAxis?.setDrawGridLines(false)//是否显示Y坐标轴上的刻度横线，默认是true
+        leftAxis?.setDrawGridLines(true)//是否显示Y坐标轴上的刻度横线，默认是true
+        leftAxis?.enableGridDashedLine(10f, 10f, 0f)
         leftAxis?.setDrawAxisLine(false)//是否绘制坐标轴的线，即含有坐标的那条线，默认是true
         leftAxis?.setDrawZeroLine(false)//是否绘制0刻度线
         leftAxis?.setDrawLabels(true) //是否显示y轴的刻度
@@ -342,12 +343,10 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
         volume_chart.isDragDecelerationEnabled = false
 
         //外边缘偏移量
-//        volume_chart.minOffset = 0f
+        volume_chart.minOffset = 0f
 
         //设置底部外边缘偏移量 便于显示X轴
 //        volume_chart.extraBottomOffset = 6f
-
-        volume_chart.minOffset = 3f
         volume_chart.setExtraOffsets(0f, 0f, 0f, 5f)
 
         //缩放
@@ -372,18 +371,6 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
             volume_chart.viewPortHandler,
             sp8
         )
-
-        //设置渲染器控制颜色、偏移，以及高亮
-//        barChart.setRenderer(
-//            OffsetBarRenderer(
-//                barChart,
-//                barChart.getAnimator(),
-//                barChart.getViewPortHandler(),
-//                barOffset
-//            )
-//                .setHighlightWidthSize(highlightWidth, sp8)
-//        )
-
 
         //Y轴-右
         val rightAxis = volume_chart.axisRight
@@ -495,12 +482,10 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
         set1.addColor(Color.GREEN)
 
         set1.isHighlightEnabled = true
-        set1.highLightAlpha = 255
+//        set1.highLightAlpha = 255
         set1.highLightColor = ContextCompat.getColor(this@MainActivity, R.color.marker_line_bg)
 
         set1.setDrawValues(false)
-
-//        val barWidth = 1f // x2 dataset
 
         val dataSets = ArrayList<IBarDataSet>()
         dataSets.add(set1)
@@ -632,7 +617,7 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
     private fun setMACDByChart() {
         val set = BarDataSet(mMacdDatas, "BarDataSet")
         set.isHighlightEnabled = true
-        set.highLightAlpha = 255
+//        set.highLightAlpha = 255
         set.highLightColor = ContextCompat.getColor(this@MainActivity, R.color.marker_line_bg)
         set.setDrawValues(false)
         set.axisDependency = YAxis.AxisDependency.LEFT
@@ -692,15 +677,9 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
 
     private fun setMaLine(ma: Int, lineEntries: MutableList<Entry>): LineDataSet {
         val lineDataSetMa = LineDataSet(lineEntries, "ma$ma")
-        if (ma == 5) {
-            lineDataSetMa.isHighlightEnabled = true
-            lineDataSetMa.setDrawHorizontalHighlightIndicator(false)
-            lineDataSetMa.highLightColor =
-                ContextCompat.getColor(this@MainActivity, R.color.marker_line_bg)
-        } else {/*此处必须得写*/
-            lineDataSetMa.isHighlightEnabled = false
-        }
-        lineDataSetMa.setDrawValues(false)
+
+
+
         when (ma) {
             5 -> lineDataSetMa.color = ContextCompat.getColor(this@MainActivity, R.color.ma5)
             10 -> lineDataSetMa.color = ContextCompat.getColor(this@MainActivity, R.color.ma10)
@@ -710,7 +689,9 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
         }
         lineDataSetMa.lineWidth = 1f
         lineDataSetMa.setDrawCircles(false)
+        lineDataSetMa.setDrawValues(false)
         lineDataSetMa.axisDependency = YAxis.AxisDependency.LEFT
+        lineDataSetMa.setDrawHorizontalHighlightIndicator(false)
         lineDataSetMa.isHighlightEnabled = false
         return lineDataSetMa
     }
@@ -737,8 +718,6 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
 
     override fun enableHighlight() {
         Log.e("enableHighlight", "enableHighlight")
-//        if (!barData!!.isHighlightEnabled()) {
-//        lineData!!.isHighlightEnabled = true
         k_line_data!!.isHighlightEnabled = true
         volume_data!!.isHighlightEnabled = true
         macd_data!!.isHighlightEnabled = true
@@ -748,15 +727,12 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
     override fun disableHighlight() {
         Log.e("disableHighlight", "disableHighlight")
         k_line_data!!.isHighlightEnabled = false
-
         volume_data!!.isHighlightEnabled = false
         macd_data!!.isHighlightEnabled = false
-        if (kLineGesture != null) {
-            kLineGesture!!.setHighlight(true)
-        }
-        if (volumeGesture != null) {
-            volumeGesture!!.setHighlight(true)
-        }
+
+        kLineGesture?.setHighlight(true)
+        volumeGesture?.setHighlight(true)
+        macdGesture?.setHighlight(true)
     }
 
     private val format4p =

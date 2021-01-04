@@ -14,17 +14,27 @@ import com.github.mikephil.charting.utils.ViewPortHandler;
 public class HighlightCombinedRenderer extends CombinedChartRenderer {
 
     private float highlightSize;//图表高亮文字大小 单位:px
+    private float barOffset;
+
+    public HighlightCombinedRenderer(CombinedChart chart, ChartAnimator animator,
+                                     ViewPortHandler viewPortHandler, float highlightSize, float barOffset) {
+        super(chart, animator, viewPortHandler);
+        this.highlightSize = highlightSize;
+        this.barOffset = barOffset;
+    }
 
     public HighlightCombinedRenderer(CombinedChart chart, ChartAnimator animator,
                                      ViewPortHandler viewPortHandler, float highlightSize) {
         super(chart, animator, viewPortHandler);
         this.highlightSize = highlightSize;
+        this.barOffset = 0;
     }
+
 
     @Override
     public void createRenderers() {
         mRenderers.clear();
-        CombinedChart chart = (CombinedChart)mChart.get();
+        CombinedChart chart = (CombinedChart) mChart.get();
         if (chart == null)
             return;
         DrawOrder[] orders = chart.getDrawOrder();
@@ -32,7 +42,7 @@ public class HighlightCombinedRenderer extends CombinedChartRenderer {
             switch (order) {
                 case BAR:
                     if (chart.getBarData() != null)
-                        mRenderers.add(new HighlightBarRenderer(chart, mAnimator, mViewPortHandler));
+                        mRenderers.add(new HighlightBarRenderer(chart, mAnimator, mViewPortHandler, barOffset));
                     break;
                 case BUBBLE:
                     if (chart.getBubbleData() != null)

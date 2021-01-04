@@ -117,9 +117,9 @@ public class HighlightCandleRenderer extends CandleStickChartRenderer {
 
                 } else {
                     if ((int) data == 1) {
-                        drawValue(c, "buy", x, y - yOffset, dataSet.getValueTextColor(j / 2));
+                        drawValue(c, "B", x, y - yOffset, dataSet.getValueTextColor(j / 2));
                     } else if ((int) data == 2) {
-                        drawValue(c, "sell", x, y - yOffset, dataSet.getValueTextColor(j / 2));
+                        drawValue(c, "S", x, y - yOffset, dataSet.getValueTextColor(j / 2));
                     }
                 }
 

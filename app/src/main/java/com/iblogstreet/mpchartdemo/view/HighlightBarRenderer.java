@@ -4,6 +4,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.util.Log;
 
 import com.github.mikephil.charting.animation.ChartAnimator;
 import com.github.mikephil.charting.buffer.BarBuffer;
@@ -28,8 +29,8 @@ import java.text.DecimalFormat;
  * 自定义BarChart渲染器 使Bar的颜色根据取值来实现 自定义高亮
  * 只修改 {@link #drawDataSet(Canvas, IBarDataSet, int)} 中设置多种颜色的情况
  * 使用方法: 1.先设置渲染器 {@link BarChart#setRenderer(DataRenderer)} 传入此渲染器
- *           2.再调用 {@link BarDataSet#setColors(int...)} 设置多种颜色;
- *           3.设置数据时 调用 {@link BarEntry#BarEntry(float, float, Object)} 传入Integer类型的data指明第几种颜色.
+ * 2.再调用 {@link BarDataSet#setColors(int...)} 设置多种颜色;
+ * 3.设置数据时 调用 {@link BarEntry#BarEntry(float, float, Object)} 传入Integer类型的data指明第几种颜色.
  */
 public class HighlightBarRenderer extends BarChartRenderer {
 
@@ -80,7 +81,7 @@ public class HighlightBarRenderer extends BarChartRenderer {
             final float barWidthHalf = barWidth / 2.0f;
             float x;
 
-            for (int i = 0, count = Math.min((int)(Math.ceil((float)(dataSet.getEntryCount()) * phaseX)),
+            for (int i = 0, count = Math.min((int) (Math.ceil((float) (dataSet.getEntryCount()) * phaseX)),
                     dataSet.getEntryCount()); i < count; i++) {
 
                 BarEntry e = dataSet.getEntryForIndex(i);
@@ -177,6 +178,7 @@ public class HighlightBarRenderer extends BarChartRenderer {
             float yMaxValue = mChart.getYChartMax();
             float yMin = getYPixelForValues(xp, yMaxValue);
             float yMax = getYPixelForValues(xp, 0);
+            Log.e("drawHighlighted", "y:" + y + ":" + yMax);
             if (y >= 0 && y <= yMax) {//在区域内即绘制横线
                 float xMax = mChart.getWidth();
                 int halfPaddingVer = 5;//竖向半个padding
@@ -185,6 +187,7 @@ public class HighlightBarRenderer extends BarChartRenderer {
                 mHighlightPaint.setStyle(Paint.Style.STROKE);
                 float yValue = (yMax - y) / (yMax - yMin) * yMaxValue;
                 String text = format.format(yValue);
+                Log.e("text",":text"+text);
                 int width = Utils.calcTextWidth(mHighlightPaint, text);
                 int height = Utils.calcTextHeight(mHighlightPaint, text);
                 float top = Math.max(0, y - height / 2F - halfPaddingVer);//考虑间隙
