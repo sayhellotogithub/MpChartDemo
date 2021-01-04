@@ -32,7 +32,7 @@ public class HighlightCombinedRenderer extends CombinedChartRenderer {
             switch (order) {
                 case BAR:
                     if (chart.getBarData() != null)
-                        mRenderers.add(new OffsetBarRenderer(chart, mAnimator, mViewPortHandler));
+                        mRenderers.add(new HighlightBarRenderer(chart, mAnimator, mViewPortHandler));
                     break;
                 case BUBBLE:
                     if (chart.getBubbleData() != null)

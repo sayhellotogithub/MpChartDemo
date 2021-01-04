@@ -8,7 +8,6 @@
             android:id="@+id/ivMarker"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:text=""
             android:background="@color/marker_line_bg"
             android:textColor="@color/marker_line_bg"/>
 

@@ -22,6 +22,11 @@ import com.github.mikephil.charting.utils.Transformer
 import com.iblogstreet.mpchartdemo.R
 import com.iblogstreet.mpchartdemo.util.DataRequest
 import com.iblogstreet.mpchartdemo.view.*
+import com.iblogstreet.mpchartdemo.view.chart.MyCombinedChart
+import com.iblogstreet.mpchartdemo.view.chart.MyHMarkerView
+import com.iblogstreet.mpchartdemo.view.chart.YourMarkerView
+import com.loro.klinechart.chart.MyBottomMarkerView
+import com.loro.klinechart.chart.MyLeftMarkerView
 import com.loro.klinechart.util.XVolFormatter
 import java.text.DecimalFormat
 import kotlin.collections.ArrayList
@@ -73,6 +78,10 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         initView()
+
+        setMarkerView()
+        setMarkerView(volume_chart)
+        setMarkerView(index_chart)
 
         initStockChart()
         initChart()
@@ -190,19 +199,12 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
     private fun initStockChart() {
 
         var sp8: Float = sp2px(8f).toFloat()
-        k_line_chart.getDescription().setEnabled(false)
+        k_line_chart.description.isEnabled = false
         k_line_chart.setBackgroundColor(ContextCompat.getColor(this, R.color.white))
         k_line_chart.setDrawGridBackground(false)
         k_line_chart.setDrawBarShadow(false)
-        k_line_chart.setHighlightFullBarEnabled(false)
+        k_line_chart.isHighlightFullBarEnabled = false
 
-
-        //        val l = stock_chart.legend
-//        l.isWordWrapEnabled = true
-//        l.verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM
-//        l.horizontalAlignment = Legend.LegendHorizontalAlignment.CENTER
-//        l.orientation = Legend.LegendOrientation.HORIZONTAL
-//        l.setDrawInside(false)
         //取消图例
         k_line_chart.legend.isEnabled = false
 
@@ -212,6 +214,7 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
 
         //不允许甩动惯性滑动  和moveView方法有冲突 设置为false
         k_line_chart.isDragDecelerationEnabled = false
+
 
         //外边缘偏移量
         k_line_chart.minOffset = 0f
@@ -224,9 +227,8 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
         k_line_chart.setBorderColor(ContextCompat.getColor(this@MainActivity, R.color.border_color))
 
         //缩放
-        k_line_chart.setScaleXEnabled(true) //X轴缩放
-        k_line_chart.isScaleYEnabled = true
-//        stock_chart.isAutoScaleMinMaxEnabled = true//自适应最大最小值
+        k_line_chart.isScaleXEnabled = true
+        k_line_chart.isAutoScaleMinMaxEnabled = true//自适应最大最小值
 
         // draw bars behind lines
         k_line_chart.drawOrder = arrayOf(
@@ -257,7 +259,7 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
         //Y轴-右
         val rightAxis = k_line_chart.axisRight
         rightAxis.isEnabled = false
-        rightAxis.axisMinimum = 0f // this replaces setStartAtZero(true)
+//        rightAxis.axisMinimum = 0f // this replaces setStartAtZero(true)
         rightAxis?.setDrawLabels(false)
         rightAxis?.setDrawGridLines(false)
         rightAxis?.setDrawAxisLine(false)
@@ -266,19 +268,18 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
         //Y轴-左
         val leftAxis = k_line_chart.axisLeft
         leftAxis.setPosition(YAxis.YAxisLabelPosition.INSIDE_CHART)//标签显示在内侧
-        leftAxis.setDrawGridLines(true)
+        leftAxis.setDrawGridLines(false)
 //        leftAxis.gridColor = black
 //        leftAxis.gridLineWidth
 
 //        leftAxis.isEnabled = false
-        leftAxis.axisMinimum = 0f // this replaces setStartAtZero(true)
+//        leftAxis.axisMinimum = 0f // this replaces setStartAtZero(true)
 
         leftAxis.textColor = gray
         leftAxis.textSize = 8f
 //        leftAxis.setLabelCount(5, true)
-        leftAxis.enableGridDashedLine(5f, 4f, 0f)//横向网格线设置为虚线
 
-        leftAxis?.setDrawGridLines(true)//是否显示Y坐标轴上的刻度横线，默认是true
+        leftAxis?.setDrawGridLines(false)//是否显示Y坐标轴上的刻度横线，默认是true
         leftAxis?.setDrawAxisLine(false)//是否绘制坐标轴的线，即含有坐标的那条线，默认是true
         leftAxis?.setDrawZeroLine(false)//是否绘制0刻度线
         leftAxis?.setDrawLabels(true) //是否显示y轴的刻度
@@ -291,10 +292,17 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
 
         //X轴
         val xAxis = k_line_chart.xAxis
+        xAxis.setDrawGridLines(true)
         xAxis.setDrawLabels(true)
+//        xAxis.setDrawAxisLine(false)
         xAxis.position = XAxisPosition.BOTTOM
         xAxis.axisMinimum = 0f
-        xAxis.granularity = 1f
+        xAxis?.enableGridDashedLine(
+            10f,
+            10f,
+            0f
+        )
+//        xAxis.granularity = 1f
 
         xAxis.gridColor = black;//网格线颜色
         xAxis.textColor = gray;//标签颜色
@@ -305,6 +313,7 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
         //转换x轴的数字为文字
         xAxis.valueFormatter = XVolFormatter(mXVals)
 
+        k_line_chart.animateXY(2000, 2000)
     }
 
     private fun initChart() {
@@ -314,6 +323,7 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
         volume_chart.setDrawGridBackground(false)
         volume_chart.setDrawBarShadow(false)
         volume_chart.setHighlightFullBarEnabled(false)
+        volume_chart.setDrawBorders(false)
 
         //        val l = stock_chart.legend
 //        l.isWordWrapEnabled = true
@@ -332,10 +342,13 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
         volume_chart.isDragDecelerationEnabled = false
 
         //外边缘偏移量
-        volume_chart.minOffset = 0f
+//        volume_chart.minOffset = 0f
 
         //设置底部外边缘偏移量 便于显示X轴
-        volume_chart.extraBottomOffset = 6f
+//        volume_chart.extraBottomOffset = 6f
+
+        volume_chart.minOffset = 3f
+        volume_chart.setExtraOffsets(0f, 0f, 0f, 5f)
 
         //缩放
         volume_chart.isScaleXEnabled = true //X轴缩放
@@ -343,10 +356,10 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
         volume_chart.isAutoScaleMinMaxEnabled = true//自适应最大最小值
 
         // draw bars behind lines
-//        barChart.drawOrder = arrayOf(
-//            CombinedChart.DrawOrder.BAR,
-//            CombinedChart.DrawOrder.LINE
-//        )
+        volume_chart.drawOrder = arrayOf(
+            CombinedChart.DrawOrder.BAR,
+            CombinedChart.DrawOrder.LINE
+        )
 
         val trans: Transformer = volume_chart.getTransformer(YAxis.AxisDependency.LEFT)
         volume_chart.rendererLeftYAxis =
@@ -400,6 +413,9 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
         xAxis.isEnabled = false
         xAxis.axisMinimum = 0f
         xAxis.granularity = 1f
+
+        xAxis.setDrawGridLines(true)
+        xAxis.setDrawAxisLine(false)
 
         xAxis.gridColor = black;//网格线颜色
         xAxis.textColor = gray;//标签颜色
@@ -484,14 +500,14 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
 
         set1.setDrawValues(false)
 
-        val barWidth = 1f // x2 dataset
+//        val barWidth = 1f // x2 dataset
 
         val dataSets = ArrayList<IBarDataSet>()
         dataSets.add(set1)
 
         val d = BarData(dataSets)
 
-        d.barWidth = barWidth
+//        d.barWidth = barWidth
         return d
     }
 
@@ -511,7 +527,8 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
                     bean.High,
                     bean.Low,
                     bean.Open,
-                    bean.Close
+                    bean.Close,
+                    if (count == 1) 1 else if (count == 50) 2 else 0
                 )
             )
 
@@ -562,7 +579,8 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
 
         data.setData(LineData(bars))
         volume_chart.data = data
-        volume_chart.invalidate()
+//        volume_chart.invalidate()
+        setHandler(volume_chart)
     }
 
     private fun setKlineChart() {
@@ -586,7 +604,7 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
         set.neutralColor =
             ContextCompat.getColor(this@MainActivity, R.color.increasing_color)//设置开盘价等于收盘价的颜色
         set.shadowColorSameAsCandle = true
-        set.highlightLineWidth = 1f
+//        set.highlightLineWidth = 1f
         set.highLightColor = ContextCompat.getColor(this@MainActivity, R.color.marker_line_bg)
         set.setDrawValues(true)
         set.valueTextColor = ContextCompat.getColor(this@MainActivity, R.color.marker_text_bg)
@@ -600,11 +618,13 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
         sets.add(setMaLine(60, mMa60Datas))
 
         k_line_data = CandleData(set)
+        k_line_data!!.setDrawValues(true)
         val data = CombinedData()
         data.setData(k_line_data)
         data.setData(LineData(sets))
 
         k_line_chart.data = data
+
         setHandler(k_line_chart)
     }
 
@@ -632,7 +652,8 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
         combinedData.setData(macd_data)
         combinedData.setData(lineData)
         index_chart.data = combinedData
-        index_chart.invalidate()
+        setHandler(index_chart)
+//        index_chart.invalidate()
 
     }
 
@@ -722,7 +743,6 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
         volume_data!!.isHighlightEnabled = true
         macd_data!!.isHighlightEnabled = true
 
-
     }
 
     override fun disableHighlight() {
@@ -773,5 +793,21 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
         tv_line_info.visibility = View.GONE
         tvLine.setVisibility(View.GONE)
     }
+
+    private fun setMarkerView() {
+//        val leftMarkerView = YourMarkerView(this@MainActivity, R.layout.markerview_kline)
+//        val hMarkerView = YourMarkerView(this@MainActivity, R.layout.markerview_kline)
+////        k_line_chart.marker = hMarkerView
+////        val bottomMarkerView = MyBottomMarkerView(this@MainActivity, R.layout.markerview_kline)
+//        k_line_chart.setMarker(hMarkerView)
+    }
+
+    private fun setMarkerView(combinedChart: CombinedChart) {
+//        val leftMarkerView = MyLeftMarkerView(this@MainActivity, R.layout.markerview_kline)
+//        val hMarkerView = YourMarkerView(this@MainActivity, R.layout.markerview_kline)
+//        combinedChart.setMarker( hMarkerView)
+//        combinedChart.marker = hMarkerView
+    }
+
 
 }

@@ -93,22 +93,19 @@ public class MyCombinedChart extends CombinedChart {
             if (!mViewPortHandler.isInBounds(pos[0], pos[1]))
                 continue;
 
-//            if ("volumeChart" == mTag)
-//                Log.e("onValueSelected", "touchY = " + mIndicesToHighlight[i].getTouchY());
-//
-//            if (null != myMarkerViewH) {
-//                myMarkerViewH.refreshContent(e, mIndicesToHighlight[i]);
-//                int width = (int) mViewPortHandler.contentWidth();
-//                myMarkerViewH.setIvWidth(width);
-//                myMarkerViewH.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED),
-//                        MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
-//                myMarkerViewH.layout(0, 0, width,
-//                        myMarkerViewH.getMeasuredHeight());
-//                myMarkerViewH.draw(canvas, mViewPortHandler.contentLeft(), mIndicesToHighlight[i].getTouchY() - myMarkerViewH.getHeight() / 2);
-//
-//            }
 
-//            if (null != myMarkerViewLeft && mIndicesToHighlight[i].getTouchY() >= 0) {
+            if (null != myMarkerViewH) {
+                myMarkerViewH.refreshContent(e, mIndicesToHighlight[i]);
+                int width = (int) mViewPortHandler.contentWidth();
+                myMarkerViewH.setIvWidth(width);
+                myMarkerViewH.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED),
+                        MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+                myMarkerViewH.layout(0, 0, width,
+                        myMarkerViewH.getMeasuredHeight());
+                myMarkerViewH.draw(canvas, mViewPortHandler.contentLeft(), mIndicesToHighlight[i].getDrawX() - myMarkerViewH.getHeight() / 2);
+            }
+
+//            if (null != myMarkerViewLeft && mIndicesToHighlight[i].getYPx() >= 0) {
 //                //修改标记值
 //                float yValForHighlight = mIndicesToHighlight[i].getTouchYValue();
 //                myMarkerViewLeft.setData(yValForHighlight);
