@@ -15,7 +15,6 @@ import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineScatterCandleRadarDataSet;
 import com.github.mikephil.charting.renderer.DataRenderer;
-import com.github.mikephil.charting.renderer.LineChartRenderer;
 import com.github.mikephil.charting.utils.MPPointD;
 import com.github.mikephil.charting.utils.Utils;
 import com.github.mikephil.charting.utils.ViewPortHandler;
@@ -25,9 +24,9 @@ import java.text.DecimalFormat;
 /**
  * 自定义LineChart渲染器 绘制高亮  -- 绘制方式和自定义CandleStickChart渲染器相同
  * 使用方法: 1.先设置渲染器 {@link CombinedChart#setRenderer(DataRenderer)}
- *              传入自定义渲染器 将其中Line图的渲染器替换成此渲染器
- *           2.设置数据时 调用 {@link Entry#Entry(float, float, Object)}
- *              传入String类型的data 以绘制x的值  -- 如未设置 则只绘制竖线
+ * 传入自定义渲染器 将其中Line图的渲染器替换成此渲染器
+ * 2.设置数据时 调用 {@link Entry#Entry(float, float, Object)}
+ * 传入String类型的data 以绘制x的值  -- 如未设置 则只绘制竖线
  */
 public class HighlightLineRenderer extends LineChartRenderer {
 

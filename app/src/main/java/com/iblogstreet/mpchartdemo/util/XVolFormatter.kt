@@ -1,4 +1,4 @@
-package com.loro.klinechart.util
+package com.iblogstreet.mpchartdemo.util
 
 
 import com.github.mikephil.charting.formatter.ValueFormatter

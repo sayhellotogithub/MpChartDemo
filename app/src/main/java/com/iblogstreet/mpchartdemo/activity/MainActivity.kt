@@ -23,9 +23,8 @@ import com.github.mikephil.charting.utils.Transformer
 import com.iblogstreet.mpchartdemo.R
 import com.iblogstreet.mpchartdemo.util.DataRequest
 import com.iblogstreet.mpchartdemo.view.*
-import com.loro.klinechart.util.XVolFormatter
+import com.iblogstreet.mpchartdemo.util.XVolFormatter
 import java.text.DecimalFormat
-import java.text.ParseException
 import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeListener,
@@ -551,6 +550,8 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
         setValumeChart()
         setMACDByChart()
 
+        Float.NaN
+
     }
 
     private fun setValumeChart() {
@@ -606,7 +607,7 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
         sets.add(setMaLine(60, mMa60Datas))
 
         k_line_data = CandleData(set)
-        k_line_data!!.setDrawValues(true)
+
         val data = CombinedData()
         data.setData(k_line_data)
         data.setData(LineData(sets))
@@ -649,7 +650,7 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
         val viewPortHandlerBar = combinedChart.viewPortHandler
         viewPortHandlerBar.setMaximumScaleX(culcMaxscale(mKlineDatas.size.toFloat()))
         val touchMatrix = viewPortHandlerBar.matrixTouch
-        val xScale =3f
+        val xScale = 3f
         touchMatrix.postScale(xScale, 1f)
     }
 
