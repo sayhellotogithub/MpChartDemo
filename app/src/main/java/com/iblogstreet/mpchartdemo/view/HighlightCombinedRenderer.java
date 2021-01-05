@@ -5,6 +5,7 @@ import com.github.mikephil.charting.charts.CombinedChart;
 import com.github.mikephil.charting.charts.CombinedChart.DrawOrder;
 import com.github.mikephil.charting.renderer.BubbleChartRenderer;
 import com.github.mikephil.charting.renderer.CombinedChartRenderer;
+import com.github.mikephil.charting.renderer.DataRenderer;
 import com.github.mikephil.charting.renderer.ScatterChartRenderer;
 import com.github.mikephil.charting.utils.ViewPortHandler;
 
@@ -15,6 +16,8 @@ public class HighlightCombinedRenderer extends CombinedChartRenderer {
 
     private float highlightSize;//图表高亮文字大小 单位:px
     private float barOffset;
+    private float highLightWidth;
+
 
     public HighlightCombinedRenderer(CombinedChart chart, ChartAnimator animator,
                                      ViewPortHandler viewPortHandler, float highlightSize, float barOffset) {
@@ -30,6 +33,20 @@ public class HighlightCombinedRenderer extends CombinedChartRenderer {
         this.barOffset = 0;
     }
 
+    public HighlightCombinedRenderer(CombinedChart chart, ChartAnimator animator,
+                                     ViewPortHandler viewPortHandler, float highlightSize, float barOffset, float highLightWidth) {
+        this(chart, animator, viewPortHandler, highlightSize, barOffset);
+        this.highLightWidth = highLightWidth;
+    }
+
+    public void changeTouch(boolean isOnTouch) {
+        for (DataRenderer renderer : mRenderers) {
+            if (renderer instanceof HighlightTouchListener) {
+                ((HighlightTouchListener) renderer).onTouch(isOnTouch);
+            }
+        }
+    }
+
 
     @Override
     public void createRenderers() {
@@ -42,7 +59,7 @@ public class HighlightCombinedRenderer extends CombinedChartRenderer {
             switch (order) {
                 case BAR:
                     if (chart.getBarData() != null)
-                        mRenderers.add(new HighlightBarRenderer(chart, mAnimator, mViewPortHandler, barOffset));
+                        mRenderers.add(new HighlightBarRenderer(chart, mAnimator, mViewPortHandler, barOffset).setHighlightSize(highlightSize).setHighLineWidth(highLightWidth));
                     break;
                 case BUBBLE:
                     if (chart.getBubbleData() != null)

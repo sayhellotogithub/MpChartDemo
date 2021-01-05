@@ -5,7 +5,7 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.github.mikephil.charting.charts.BarLineChartBase;
+import com.github.mikephil.charting.charts.CombinedChart;
 import com.github.mikephil.charting.highlight.Highlight;
 
 /**
@@ -13,12 +13,12 @@ import com.github.mikephil.charting.highlight.Highlight;
  */
 public class ChartFingerTouchListener implements View.OnTouchListener {
 
-    private BarLineChartBase mChart;
+    private CombinedChart mChart;
     private GestureDetector mDetector;
     private HighlightListener mListener;
     private boolean mIsLongPress = false;
 
-    public ChartFingerTouchListener(BarLineChartBase chart, HighlightListener listener) {
+    public ChartFingerTouchListener(CombinedChart chart, HighlightListener listener) {
         mChart = chart;
         mListener = listener;
         mDetector = new GestureDetector(mChart.getContext(), new GestureDetector.SimpleOnGestureListener() {
@@ -28,11 +28,11 @@ public class ChartFingerTouchListener implements View.OnTouchListener {
                 mIsLongPress = true;
                 Log.e("GestureDetector","onLongPress");
                 if (mListener != null) {
-                    mListener.enableHighlight();
+                    mListener.enableHighlight(mChart);
                 }
                 Highlight h = mChart.getHighlightByTouchPoint(e.getX(), e.getY());
                 if (h != null) {
-                    h.setDraw(e.getX(), e.getY());
+                    h.setDraw(e.getX(), e.getY()-mChart.getTop());
                     mChart.highlightValue(h, true);
                     mChart.disableScroll();
                 }
@@ -53,11 +53,11 @@ public class ChartFingerTouchListener implements View.OnTouchListener {
         }
         if (mIsLongPress && event.getAction() == MotionEvent.ACTION_MOVE) {
             if (mListener != null) {
-                mListener.enableHighlight();
+                mListener.enableHighlight(mChart);
             }
             Highlight h = mChart.getHighlightByTouchPoint(event.getX(), event.getY());
             if (h != null) {
-                h.setDraw(event.getX(), event.getY());
+                h.setDraw(event.getX(), event.getY()-mChart.getTop());
                 mChart.highlightValue(h, true);
                 mChart.disableScroll();
             }
@@ -67,7 +67,7 @@ public class ChartFingerTouchListener implements View.OnTouchListener {
     }
 
     public interface HighlightListener {
-        void enableHighlight();
+        void enableHighlight(CombinedChart mChart);
         void disableHighlight();
     }
 }

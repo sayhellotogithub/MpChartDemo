@@ -5,6 +5,7 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.github.mikephil.charting.animation.ChartAnimator;
 import com.github.mikephil.charting.charts.CombinedChart;
@@ -15,6 +16,7 @@ import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.dataprovider.CandleDataProvider;
 import com.github.mikephil.charting.interfaces.datasets.ICandleDataSet;
+import com.github.mikephil.charting.interfaces.datasets.ILineScatterCandleRadarDataSet;
 import com.github.mikephil.charting.renderer.CandleStickChartRenderer;
 import com.github.mikephil.charting.renderer.DataRenderer;
 import com.github.mikephil.charting.utils.MPPointD;
@@ -33,11 +35,12 @@ import java.util.List;
  * 2.设置数据时 调用 {@link CandleEntry#CandleEntry(float, float, float, float, float, Object)}
  * 传入String类型的data 以绘制x的值  -- 如未设置 则只绘制竖线
  */
-public class HighlightCandleRenderer extends CandleStickChartRenderer {
+public class HighlightCandleRenderer extends CandleStickChartRenderer implements HighlightTouchListener {
 
     private float highlightSize;//图表高亮文字大小 单位:px
     private DecimalFormat format = new DecimalFormat("0.0000");
     private Highlight[] indices;
+    private boolean isTouchOn;
 
     public HighlightCandleRenderer(CandleDataProvider chart, ChartAnimator animator,
                                    ViewPortHandler viewPortHandler) {
@@ -146,6 +149,12 @@ public class HighlightCandleRenderer extends CandleStickChartRenderer {
 //        }
     }
 
+
+    @Override
+    protected void drawHighlightLines(Canvas c, float x, float y, ILineScatterCandleRadarDataSet set) {
+
+    }
+
     @Override
     public void drawExtras(Canvas c) {
         if (indices == null) {
@@ -216,7 +225,9 @@ public class HighlightCandleRenderer extends CandleStickChartRenderer {
             float yMinValue = mChart.getYChartMin();
             float yMin = getYPixelForValues(xp, yMaxValue);
             float yMax = getYPixelForValues(xp, yMinValue);
-            if (y >= 0 && y <= contentBottom) {//在区域内即绘制横线
+            Log.e("HighlightCandleRenderer",y+":"+contentBottom);
+//            if (y >= 0 && y <= contentBottom) {//在区域内即绘制横线
+            if(isTouchOn){
                 //先绘制文字框
                 mHighlightPaint.setStyle(Paint.Style.STROKE);
                 float yValue = (yMax - y) / (yMax - yMin) * (yMaxValue - yMinValue) + yMinValue;
@@ -241,5 +252,10 @@ public class HighlightCandleRenderer extends CandleStickChartRenderer {
             }
         }
         indices = null;
+    }
+
+    @Override
+    public void onTouch(boolean isTouchOn) {
+        this.isTouchOn = isTouchOn;
     }
 }

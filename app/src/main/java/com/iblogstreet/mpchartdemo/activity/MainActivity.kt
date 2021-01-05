@@ -22,19 +22,13 @@ import com.github.mikephil.charting.utils.Transformer
 import com.iblogstreet.mpchartdemo.R
 import com.iblogstreet.mpchartdemo.util.DataRequest
 import com.iblogstreet.mpchartdemo.view.*
-import com.iblogstreet.mpchartdemo.view.chart.MyCombinedChart
-import com.iblogstreet.mpchartdemo.view.chart.MyHMarkerView
-import com.iblogstreet.mpchartdemo.view.chart.YourMarkerView
-import com.loro.klinechart.chart.MyBottomMarkerView
-import com.loro.klinechart.chart.MyLeftMarkerView
 import com.loro.klinechart.util.XVolFormatter
 import java.text.DecimalFormat
 import kotlin.collections.ArrayList
 
-
 class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeListener,
     CoupleChartValueSelectedListener.ValueSelectedListener,
-    ChartFingerTouchListener.HighlightListener {
+    ChartFingerTouchListenerV1.HighlightListener {
 
     private lateinit var volume_chart: CombinedChart
     private lateinit var k_line_chart: CombinedChart
@@ -71,6 +65,7 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
 
 
     private var mMaxVolume = 0f
+    private var highlightLineWidth = 1f
     private var mXVals = mutableMapOf<Float, String>()
 
 
@@ -78,10 +73,6 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         initView()
-
-        setMarkerView()
-        setMarkerView(volume_chart)
-        setMarkerView(index_chart)
 
         initStockChart()
         initChart()
@@ -168,10 +159,11 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
             )
         )
 
-        k_line_chart.setOnTouchListener(ChartFingerTouchListener(k_line_chart, this)) //手指长按滑动高亮
+//        index_chart.setOnTouchListener(ChartFingerTouchListener(index_chart,this))
+//        k_line_chart.setOnTouchListener(ChartFingerTouchListener(k_line_chart,this))
+//        volume_chart.setOnTouchListener(ChartFingerTouchListener(volume_chart,this))
 
-        volume_chart.setOnTouchListener(ChartFingerTouchListener(volume_chart, this))
-        index_chart.setOnTouchListener(ChartFingerTouchListener(index_chart, this))
+        fl_main_touch.setOnTouchListener(ChartFingerTouchListenerV1( this,this,k_line_chart,volume_chart,index_chart))
 
     }
 
@@ -369,7 +361,7 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
             volume_chart,
             volume_chart.animator,
             volume_chart.viewPortHandler,
-            sp8
+            sp8, 0f, highlightLineWidth
         )
 
         //Y轴-右
@@ -465,7 +457,7 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
             index_chart,
             index_chart.animator,
             index_chart.viewPortHandler,
-            sp8
+            sp8, 0f, highlightLineWidth
         )
 
         index_chart.animateXY(2000, 2000)
@@ -589,8 +581,9 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
         set.neutralColor =
             ContextCompat.getColor(this@MainActivity, R.color.increasing_color)//设置开盘价等于收盘价的颜色
         set.shadowColorSameAsCandle = true
-//        set.highlightLineWidth = 1f
+
         set.highLightColor = ContextCompat.getColor(this@MainActivity, R.color.marker_line_bg)
+        set.highlightLineWidth = highlightLineWidth
         set.setDrawValues(true)
         set.valueTextColor = ContextCompat.getColor(this@MainActivity, R.color.marker_text_bg)
 
@@ -716,7 +709,20 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
 //        }
     }
 
-    override fun enableHighlight() {
+    override fun enableHighlight(chart: CombinedChart) {
+
+        if (chart.renderer is HighlightCombinedRenderer) {
+            (chart.renderer as HighlightCombinedRenderer).changeTouch(true)
+        }
+        if (chart != k_line_chart) {
+            (k_line_chart.renderer as HighlightCombinedRenderer).changeTouch(false)
+        }
+        if (chart != volume_chart) {
+            (volume_chart.renderer as HighlightCombinedRenderer).changeTouch(false)
+        }
+        if (chart != index_chart) {
+            (index_chart.renderer as HighlightCombinedRenderer).changeTouch(false)
+        }
         Log.e("enableHighlight", "enableHighlight")
         k_line_data!!.isHighlightEnabled = true
         volume_data!!.isHighlightEnabled = true
@@ -725,6 +731,10 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
     }
 
     override fun disableHighlight() {
+        (k_line_chart.renderer as HighlightCombinedRenderer).changeTouch(false)
+        (volume_chart.renderer as HighlightCombinedRenderer).changeTouch(false)
+        (index_chart.renderer as HighlightCombinedRenderer).changeTouch(false)
+
         Log.e("disableHighlight", "disableHighlight")
         k_line_data!!.isHighlightEnabled = false
         volume_data!!.isHighlightEnabled = false
@@ -768,21 +778,6 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
         cl_klHighlight.visibility = View.GONE
         tv_line_info.visibility = View.GONE
         tvLine.setVisibility(View.GONE)
-    }
-
-    private fun setMarkerView() {
-//        val leftMarkerView = YourMarkerView(this@MainActivity, R.layout.markerview_kline)
-//        val hMarkerView = YourMarkerView(this@MainActivity, R.layout.markerview_kline)
-////        k_line_chart.marker = hMarkerView
-////        val bottomMarkerView = MyBottomMarkerView(this@MainActivity, R.layout.markerview_kline)
-//        k_line_chart.setMarker(hMarkerView)
-    }
-
-    private fun setMarkerView(combinedChart: CombinedChart) {
-//        val leftMarkerView = MyLeftMarkerView(this@MainActivity, R.layout.markerview_kline)
-//        val hMarkerView = YourMarkerView(this@MainActivity, R.layout.markerview_kline)
-//        combinedChart.setMarker( hMarkerView)
-//        combinedChart.marker = hMarkerView
     }
 
 

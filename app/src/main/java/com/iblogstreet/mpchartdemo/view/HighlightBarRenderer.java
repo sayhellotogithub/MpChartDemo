@@ -32,12 +32,14 @@ import java.text.DecimalFormat;
  * 2.再调用 {@link BarDataSet#setColors(int...)} 设置多种颜色;
  * 3.设置数据时 调用 {@link BarEntry#BarEntry(float, float, Object)} 传入Integer类型的data指明第几种颜色.
  */
-public class HighlightBarRenderer extends BarChartRenderer {
+public class HighlightBarRenderer extends BarChartRenderer implements HighlightTouchListener {
 
     protected float barOffset;//BarChart绘制时偏移多少个单位 --小于0时向左偏移
-    protected float highlightWidth, highlightSize;//高亮线宽度 单位:dp  /  高亮文字大小 单位:px
+    protected float highLineWidth, highlightSize;//高亮线宽度 单位:dp
     private RectF mBarShadowRectBuffer = new RectF();
     private DecimalFormat format = new DecimalFormat("0.0000");//保留小数点后四位
+    private Highlight[] indices;
+    private boolean isTouchOn;
 
     public HighlightBarRenderer(BarDataProvider chart, ChartAnimator animator, ViewPortHandler viewPortHandler) {
         this(chart, animator, viewPortHandler, 0);
@@ -48,6 +50,17 @@ public class HighlightBarRenderer extends BarChartRenderer {
         super(chart, animator, viewPortHandler);
         barOffset = barOffsetCount;
     }
+
+    public HighlightBarRenderer setHighlightSize(float textSize) {
+        highlightSize = textSize;
+        return this;
+    }
+
+    public HighlightBarRenderer setHighLineWidth(float highLineWidth) {
+        this.highLineWidth = highLineWidth;
+        return this;
+    }
+
 
     @Override
     public void initBuffers() {
@@ -144,56 +157,65 @@ public class HighlightBarRenderer extends BarChartRenderer {
         }
     }
 
-    public HighlightBarRenderer setHighlightWidthSize(float width, float textSize) {
-        highlightWidth = Utils.convertDpToPixel(width);
-        highlightSize = textSize;
-        return this;
+    @Override
+    public void drawHighlighted(Canvas c, Highlight[] indices) {
+        this.indices = indices;
     }
 
     @Override
-    public void drawHighlighted(Canvas c, Highlight[] indices) {
-        BarData barData = mChart.getBarData();
+    public void drawExtras(Canvas c) {
+        if (indices == null) {
+            return;
+        }
+
+        BarData candleData = mChart.getBarData();
         for (Highlight high : indices) {
-            IBarDataSet set = barData.getDataSetByIndex(high.getDataSetIndex());
+            IBarDataSet set = candleData.getDataSetByIndex(high.getDataSetIndex());
             if (set == null || !set.isHighlightEnabled())
                 continue;
+
             BarEntry e = set.getEntryForXValue(high.getX(), high.getY());
             if (!isInBoundsX(e, set))
                 continue;
 
             mHighlightPaint.setColor(set.getHighLightColor());
-            mHighlightPaint.setStrokeWidth(highlightWidth);
+            mHighlightPaint.setStrokeWidth(highLineWidth);
             mHighlightPaint.setTextSize(highlightSize);
 
             //画竖线
-            float barWidth = barData.getBarWidth();
+            float barWidth = candleData.getBarWidth();
             Transformer trans = mChart.getTransformer(set.getAxisDependency());
             prepareBarHighlight(e.getX() + barOffset, 0, 0, barWidth / 2, trans);
 
             float xp = mBarRect.centerX();
             c.drawLine(xp, mViewPortHandler.getContentRect().bottom, xp, 0, mHighlightPaint);
 
+            float xMin = mViewPortHandler.contentLeft();
+            float xMax = mViewPortHandler.contentRight();
+            float contentBottom = mViewPortHandler.contentBottom();
+            //画竖线
+            int halfPaddingVer = 5;//竖向半个padding
+            int halfPaddingHor = 8;
+            float textXHeight = 0;
+
             //判断是否画横线
             float y = high.getDrawY();
             float yMaxValue = mChart.getYChartMax();
+            float yMinValue = mChart.getYChartMin();
             float yMin = getYPixelForValues(xp, yMaxValue);
-            float yMax = getYPixelForValues(xp, 0);
-            Log.e("drawHighlighted", "y:" + y + ":" + yMax);
-            if (y >= 0 && y <= yMax) {//在区域内即绘制横线
-                float xMax = mChart.getWidth();
-                int halfPaddingVer = 5;//竖向半个padding
-                int halfPaddingHor = 8;
+            float yMax = getYPixelForValues(xp, yMinValue);
+            Log.e("HighlightBarRenderer", y + ":" + contentBottom);
+            if (isTouchOn) {
                 //先绘制文字框
                 mHighlightPaint.setStyle(Paint.Style.STROKE);
-                float yValue = (yMax - y) / (yMax - yMin) * yMaxValue;
+                float yValue = (yMax - y) / (yMax - yMin) * (yMaxValue - yMinValue) + yMinValue;
                 String text = format.format(yValue);
-                Log.e("text",":text"+text);
                 int width = Utils.calcTextWidth(mHighlightPaint, text);
                 int height = Utils.calcTextHeight(mHighlightPaint, text);
                 float top = Math.max(0, y - height / 2F - halfPaddingVer);//考虑间隙
                 float bottom = top + height + halfPaddingVer * 2;
-                if (bottom > yMax) {
-                    bottom = yMax;
+                if (bottom > contentBottom) {
+                    bottom = contentBottom;
                     top = bottom - height - halfPaddingVer * 2;
                 }
                 RectF rect = new RectF(xMax - width - halfPaddingHor * 2, top, xMax, bottom);
@@ -207,10 +229,16 @@ public class HighlightBarRenderer extends BarChartRenderer {
                 c.drawLine(0, y, xMax - width - halfPaddingHor * 2, y, mHighlightPaint);
             }
         }
+        indices = null;
     }
 
     protected float getYPixelForValues(float x, float y) {
         MPPointD pixels = mChart.getTransformer(YAxis.AxisDependency.LEFT).getPixelForValues(x, y);
         return (float) pixels.y;
+    }
+
+    @Override
+    public void onTouch(boolean isTouchOn) {
+        this.isTouchOn = isTouchOn;
     }
 }
