@@ -47,7 +47,7 @@ public class MyCoupleChartGestureListener implements OnChartGestureListener {
     }
 
     private boolean canJudgeLoad(ChartTouchListener.ChartGesture lastPerformedGesture) {
-        return lastPerformedGesture == ChartTouchListener.ChartGesture.FLING;
+        return lastPerformedGesture == ChartTouchListener.ChartGesture.FLING||lastPerformedGesture== ChartTouchListener.ChartGesture.DRAG;
     }
 
     private float firstX = 0;
@@ -59,9 +59,9 @@ public class MyCoupleChartGestureListener implements OnChartGestureListener {
 
         Log.e("onChartGestureEnd", event.getX() + "" + lastPerformedGesture + ":");
 
-        if (isHighlight) {
-            isHighlight = false;
-        } else {
+//        if (isHighlight) {
+//            isHighlight = false;
+//        } else {
             if (isLoadMore) {
                 if (canJudgeLoad(lastPerformedGesture)) {
                     float leftX = srcChart.getLowestVisibleX();
@@ -83,7 +83,7 @@ public class MyCoupleChartGestureListener implements OnChartGestureListener {
                     canLoad = true;
                 }
             }
-        }
+//        }
         syncCharts();
         chartGestureEnd(event, lastPerformedGesture);
     }

@@ -3,6 +3,7 @@ package com.iblogstreet.mpchartdemo.activity
 import android.graphics.Color
 import android.graphics.Paint
 import android.os.Bundle
+import android.text.TextUtils
 import android.util.Log
 import android.util.TypedValue
 import android.view.MotionEvent
@@ -24,6 +25,7 @@ import com.iblogstreet.mpchartdemo.util.DataRequest
 import com.iblogstreet.mpchartdemo.view.*
 import com.loro.klinechart.util.XVolFormatter
 import java.text.DecimalFormat
+import java.text.ParseException
 import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeListener,
@@ -66,7 +68,7 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
 
     private var mMaxVolume = 0f
     private var highlightLineWidth = 1f
-    private var mXVals = mutableMapOf<Float, String>()
+    private var mXVals = HashMap<Float, String>()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -163,7 +165,15 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
 //        k_line_chart.setOnTouchListener(ChartFingerTouchListener(k_line_chart,this))
 //        volume_chart.setOnTouchListener(ChartFingerTouchListener(volume_chart,this))
 
-        fl_main_touch.setOnTouchListener(ChartFingerTouchListenerV1( this,this,k_line_chart,volume_chart,index_chart))
+        fl_main_touch.setOnTouchListener(
+            ChartFingerTouchListenerV1(
+                this,
+                this,
+                k_line_chart,
+                volume_chart,
+                index_chart
+            )
+        )
 
     }
 
@@ -639,7 +649,7 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
         val viewPortHandlerBar = combinedChart.viewPortHandler
         viewPortHandlerBar.setMaximumScaleX(culcMaxscale(mKlineDatas.size.toFloat()))
         val touchMatrix = viewPortHandlerBar.matrixTouch
-        val xScale = 3f
+        val xScale =3f
         touchMatrix.postScale(xScale, 1f)
     }
 
@@ -670,9 +680,6 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
 
     private fun setMaLine(ma: Int, lineEntries: MutableList<Entry>): LineDataSet {
         val lineDataSetMa = LineDataSet(lineEntries, "ma$ma")
-
-
-
         when (ma) {
             5 -> lineDataSetMa.color = ContextCompat.getColor(this@MainActivity, R.color.ma5)
             10 -> lineDataSetMa.color = ContextCompat.getColor(this@MainActivity, R.color.ma10)
@@ -693,20 +700,12 @@ class MainActivity : AppCompatActivity(), MyCoupleChartGestureListener.OnEdgeLis
     override fun edgeLoad(x: Float, left: Boolean) {
         //todo 边缘检测
         Log.e("edgeLoad", "$x:$left")
-        var v = x.toInt()
-//        if (!left && !mXVals.containsKey(v) && mXVals.containsKey(v - 1)) {
-//            v = v - 1
-//        }
-//        val time: String? = mXVals.get(v)
-//        if (!TextUtils.isEmpty(time)) {
-//            try {
-//                val loadingDialog = LoadingDialog.newInstance()
-//                loadingDialog.show(this)
-//
-//            } catch (e: ParseException) {
-//                e.printStackTrace()
-//            }
-//        }
+
+        val time: String? = mXVals[x]
+        if (!TextUtils.isEmpty(time)) {
+            val loadingDialog = LoadingDialog.newInstance()
+            loadingDialog.show(this)
+        }
     }
 
     override fun enableHighlight(chart: CombinedChart) {
